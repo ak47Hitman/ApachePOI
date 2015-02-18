@@ -11,15 +11,39 @@ public class ParsingHtml {
     public ParsingHtml(String inputText) {
         this.inputText = inputText;
     }
-    public void getHeader() {
+    public String getHeader() {
         System.out.println("*** JSOUP ***");
         Document doc = Jsoup.parse(inputText);
         System.out.println("H3: " + doc.getElementsByTag("h3").text());
+        return doc.getElementsByTag("h3").text();
     }
 
-    public void getTitle() {
+    public String getTitle() {
         Document doc = Jsoup.parse(inputText);
         System.out.println("Title: " + doc.getElementsByTag("title").text());
+        return doc.getElementsByTag("title").text();
+    }
+
+    public int getNumberOfTDForMergeSells() {
+        int k =0;
+        Document doc = Jsoup.parse(inputText);
+        Elements d = doc.getElementsByTag("table");
+        for (Element a : d) {
+            Elements trs = a.getElementsByTag("tr");
+            for (Element tr : trs) {
+                System.out.println("TR: " + tr.text());
+                int i = 0;
+                for (Element td : tr.getAllElements()) {
+                    if (i != 0) {
+                        k++;
+                        System.out.println("TD: " + td.text());
+                    }
+                    i++;
+                }
+                break;
+            }
+        }
+        return k;
     }
 
     public void getTable() {

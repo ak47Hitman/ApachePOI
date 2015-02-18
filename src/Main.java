@@ -20,17 +20,12 @@ public class Main {
 
         TextFile textFile = new TextFile();
         CreateExcel createExcel = new CreateExcel();
-        createExcel.createExcelDoc();
         String text1 = textFile.read(testFileName);
+        createExcel.createExcelDoc(text1);
         ParsingHtml parsingHtml = new ParsingHtml(text1);
         parsingHtml.getTitle();
         parsingHtml.getHeader();
         parsingHtml.getTable();
-
-
-
-
-
 
 //        System.out.println(textFile.read(testFileName));
 //        if ((new File(outPutFileInfo)).exists()) {
