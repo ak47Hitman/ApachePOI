@@ -16,16 +16,16 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 //        String testFileName = "C:\\Users\\logvinov\\IdeaProjects\\ApachePOI\\1.html";
-        String testFileName = "C:\\Users\\logvinov\\IdeaProjects\\ApachePOI\\3fc27176d9877fac.xls";
+        String testFileName = "C:\\Users\\logvinov\\Desktop\\MyWorkSpace\\ApachePOI\\3fc27176d9877fac.xls";
 
         TextFile textFile = new TextFile();
         CreateExcel createExcel = new CreateExcel();
         String text1 = textFile.read(testFileName);
         createExcel.createExcelDoc(text1);
-        ParsingHtml parsingHtml = new ParsingHtml(text1);
-        parsingHtml.getTitle();
-        parsingHtml.getHeader();
-        parsingHtml.getTable();
+//        ParsingHtml parsingHtml = new ParsingHtml(text1);
+//        parsingHtml.getTitle();
+//        parsingHtml.getHeader();
+//        parsingHtml.getTable();
 
 //        System.out.println(textFile.read(testFileName));
 //        if ((new File(outPutFileInfo)).exists()) {

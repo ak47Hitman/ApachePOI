@@ -1,3 +1,5 @@
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -25,25 +27,24 @@ public class ParsingHtml {
     }
 
     public int getNumberOfTDForMergeSells() {
-        int k =0;
+        int maxNumberOfCellsInRow = 0;
+        int numberOfCellsInRow = 0;
         Document doc = Jsoup.parse(inputText);
-        Elements d = doc.getElementsByTag("table");
-        for (Element a : d) {
-            Elements trs = a.getElementsByTag("tr");
+        Elements tables = doc.getElementsByTag("table");
+        for (Element table : tables) {
+            Elements trs = table.getElementsByTag("tr");
             for (Element tr : trs) {
-                System.out.println("TR: " + tr.text());
-                int i = 0;
-                for (Element td : tr.getAllElements()) {
-                    if (i != 0) {
-                        k++;
-                        System.out.println("TD: " + td.text());
-                    }
-                    i++;
+                for (Element tds : tr.getElementsByTag("td")) {
+                            numberOfCellsInRow++;
                 }
-                break;
+                if( maxNumberOfCellsInRow < numberOfCellsInRow) {
+                    maxNumberOfCellsInRow = numberOfCellsInRow;
+                }
+                numberOfCellsInRow = 0;
             }
         }
-        return k;
+        System.out.println(maxNumberOfCellsInRow);
+        return maxNumberOfCellsInRow;
     }
 
     public void getTable() {
