@@ -14,6 +14,8 @@ import org.jsoup.select.Elements;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by logvinov on 18.02.2015.
@@ -30,8 +32,8 @@ public class CreateExcel {
         Row row = sheet.createRow((short)numberOfRows);
         // Create a cell and put a value in it.
         sheet.addMergedRegion(new CellRangeAddress(
-                0, //first row (0-based)
-                0, //last row  (0-based)
+                numberOfRows, //first row (0-based)
+                numberOfRows, //last row  (0-based)
                 0, //first column (0-based)
                 parsingHtml.getNumberOfTDForMergeSells() - 1  //last column  (0-based)
         ));
@@ -50,7 +52,19 @@ public class CreateExcel {
         cell.setCellStyle(headerStyle);
 //
 //        cs.setFont(f);
-        numberOfCells++;
+
+//        numberOfCells++;
+        numberOfRows++;
+        row = sheet.createRow((short)numberOfRows);
+        sheet.addMergedRegion(new CellRangeAddress(
+                numberOfRows, //first row (0-based)
+                numberOfRows, //last row  (0-based)
+                0, //first column (0-based)
+                parsingHtml.getNumberOfTDForMergeSells() - 1  //last column  (0-based)
+        ));
+        Cell cell2 = row.createCell(numberOfCells);
+        cell2.setCellValue("");
+//        numberOfCells++;
         numberOfRows++;
         System.out.println("Cells: " + numberOfCells + " Rows :" + numberOfRows);
         CellStyle cs = wb.createCellStyle();
@@ -63,15 +77,35 @@ public class CreateExcel {
         cs2.setBorderLeft(HSSFCellStyle.BORDER_MEDIUM);
         cs2.setWrapText(true);
 
-        CellStyle rowStyle = wb.createCellStyle();
-        rowStyle.setAlignment(CellStyle.ALIGN_CENTER);
-        rowStyle.setBorderBottom(HSSFCellStyle.BORDER_MEDIUM);
-        rowStyle.setBorderTop(HSSFCellStyle.BORDER_MEDIUM);
-        rowStyle.setBorderRight(HSSFCellStyle.BORDER_MEDIUM);
-        rowStyle.setBorderLeft(HSSFCellStyle.BORDER_MEDIUM);
-        rowStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
-        rowStyle.setFillPattern(headerStyle.SOLID_FOREGROUND);
-        rowStyle.setWrapText(true);
+        CellStyle rowStyleWithForeGround = wb.createCellStyle();
+        rowStyleWithForeGround.setAlignment(CellStyle.ALIGN_CENTER);
+        rowStyleWithForeGround.setBorderBottom(HSSFCellStyle.BORDER_MEDIUM);
+        rowStyleWithForeGround.setBorderTop(HSSFCellStyle.BORDER_MEDIUM);
+        rowStyleWithForeGround.setBorderRight(HSSFCellStyle.BORDER_MEDIUM);
+        rowStyleWithForeGround.setBorderLeft(HSSFCellStyle.BORDER_MEDIUM);
+        rowStyleWithForeGround.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
+        rowStyleWithForeGround.setFillPattern(headerStyle.SOLID_FOREGROUND);
+        rowStyleWithForeGround.setWrapText(true);
+
+        CellStyle rowStyleBold = wb.createCellStyle();
+        rowStyleBold.setAlignment(CellStyle.ALIGN_CENTER);
+        rowStyleBold.setBorderBottom(HSSFCellStyle.BORDER_MEDIUM);
+        rowStyleBold.setBorderTop(HSSFCellStyle.BORDER_MEDIUM);
+        rowStyleBold.setBorderRight(HSSFCellStyle.BORDER_MEDIUM);
+        rowStyleBold.setBorderLeft(HSSFCellStyle.BORDER_MEDIUM);
+        rowStyleBold.setFont(f);
+        rowStyleBold.setWrapText(true);
+
+        CellStyle rowStyleBoldAndForeGround = wb.createCellStyle();
+        rowStyleBoldAndForeGround.setAlignment(CellStyle.ALIGN_CENTER);
+        rowStyleBoldAndForeGround.setBorderBottom(HSSFCellStyle.BORDER_MEDIUM);
+        rowStyleBoldAndForeGround.setBorderTop(HSSFCellStyle.BORDER_MEDIUM);
+        rowStyleBoldAndForeGround.setBorderRight(HSSFCellStyle.BORDER_MEDIUM);
+        rowStyleBoldAndForeGround.setBorderLeft(HSSFCellStyle.BORDER_MEDIUM);
+        rowStyleBoldAndForeGround.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
+        rowStyleBoldAndForeGround.setFillPattern(headerStyle.SOLID_FOREGROUND);
+        rowStyleBoldAndForeGround.setFont(f);
+        rowStyleBoldAndForeGround.setWrapText(true);
 //        CellStyle cs3 = wb.createCellStyle();
 //        cs3.setFillForegroundColor(HSSFColor.BLUE.index);
         Document doc = Jsoup.parse(inputText);
@@ -88,27 +122,48 @@ public class CreateExcel {
                 for (Element tds : tr.getElementsByTag("td")) {
                     System.out.println("TDDDDDDDDDD" + tds.text());
                         if (numberOfTable == 1) {
+
+
                             Cell cellInTable = rowInTable.createCell(numberOfCells);
                             cellInTable.setCellValue(tds.text());
+
+                            Pattern pattern = Pattern.compile("/(.*?)/");
+                    //        Pattern pattern = Pattern.compile("<tr>(.*?)</tr>");
+                    //        Pattern pattern = Pattern.compile("(?i)<title([^>]+)>(.+?)</title>");
+                            Matcher matcher = pattern.matcher(tds.text());
+                            System.out.println("Text1: " + tds.text());
+                            while(matcher.find()) {
+                                System.out.println("Find text: " + matcher.group(0));
+                    //            prevArray.add(matcher.group(1));
+                            }
+
                             cellInTable.setCellStyle(cs);
 
 //                            cellInTable.setCellStyle(cs3);
                             System.out.println("TD1: " + tds.text());
                             numberOfCells++;
                         } else {
+                            Elements bTag = tds.getElementsByTag("b");
+
+                            System.out.println("My length" + bTag.text().length());
                             Cell cellInTable = rowInTable.createCell(numberOfCells);
                             cellInTable.setCellValue(tds.text());
-                            if (tr.attr("style").length() != 0 ) {
-                                cellInTable.setCellStyle(rowStyle);
+                            if (tr.attr("style").length() != 0 && bTag.text().length() != 0) {
+                                cellInTable.setCellStyle(rowStyleBoldAndForeGround);
+                            } else if (tr.attr("style").length() != 0) {
+                                cellInTable.setCellStyle(rowStyleWithForeGround);
+                            } else if (bTag.text().length() != 0) {
+                                cellInTable.setCellStyle(rowStyleBold);
                             } else {
                                 cellInTable.setCellStyle(cs2);
                             }
-                            if (sheet.getRow(1).getCell(i).getStringCellValue().length() > tds.text().length()) {
-                                sheet.setColumnWidth(numberOfCells, sheet.getRow(1).getCell(numberOfCells).getStringCellValue().length() * 256);
+                            if (sheet.getRow(2).getCell(i).getStringCellValue().length() > tds.text().length()) {
+                                sheet.setColumnWidth(numberOfCells, sheet.getRow(2).getCell(numberOfCells).getStringCellValue().length() * 256);
                             }
                             System.out.println("TD2: " + tds.text());
                             numberOfCells++;
                         }
+
                 }
                 numberOfTable++;
                 numberOfRows++;
@@ -118,8 +173,8 @@ public class CreateExcel {
         for (int i = 2; i < sheet.getLastRowNum(); i++)
         {
             for (int k = 0; k < sheet.getRow(i).getLastCellNum(); k++) {
-                if (sheet.getRow(i).getCell(k).getStringCellValue().length() > sheet.getRow(1).getCell(k).getStringCellValue().length()) {
-                    sheet.setColumnWidth(k, sheet.getRow(1).getCell(k).getStringCellValue().length() * 256 * 3);
+                if (sheet.getRow(i).getCell(k).getStringCellValue().length() > sheet.getRow(2).getCell(k).getStringCellValue().length()) {
+                    sheet.setColumnWidth(k, sheet.getRow(2).getCell(k).getStringCellValue().length() * 256 * 3);
                 }
             }
         }
