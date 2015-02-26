@@ -26,7 +26,7 @@ public class ParsingHtml {
         return doc.getElementsByTag("title").text();
     }
 
-    public int getNumberOfTDForMergeSells() {
+    public int getNumberOfTDForMergeCells() {
         int maxNumberOfCellsInRow = 0;
         int numberOfCellsInRow = 0;
         Document doc = Jsoup.parse(inputText);

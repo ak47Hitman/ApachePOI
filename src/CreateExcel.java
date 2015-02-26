@@ -34,7 +34,7 @@ public class CreateExcel {
                 numberOfRows, // указываем начальную строку в которой объединяем ячейки
                 numberOfRows, // указываем конечную строку в которой объединяем ячейки (у нас начальная и конечная строки совпадают)
                 numberOfCells, // указываем начальную ячейку - унас она равна 0 - потомучто объеждиняем с первой ячейки
-                parsingHtml.getNumberOfTDForMergeSells() - 1  // указываем последюю ячейку для обеъединения - она у нас
+                parsingHtml.getNumberOfTDForMergeCells() - 1  // указываем последюю ячейку для обеъединения - она у нас
                                                               // равна максимальной возможной ячейке из всех строк таблицы
         ));
         // Создаем ячейку в первой строке
@@ -63,7 +63,7 @@ public class CreateExcel {
                 numberOfRows, //first row (0-based)
                 numberOfRows, //last row  (0-based)
                 0, //first column (0-based)
-                parsingHtml.getNumberOfTDForMergeSells() - 1  //last column  (0-based)
+                parsingHtml.getNumberOfTDForMergeCells() - 1  //last column  (0-based)
         ));
         Cell cell2 = row.createCell(numberOfCells);
         cell2.setCellValue("");
@@ -132,7 +132,7 @@ public class CreateExcel {
                 System.out.println("Cells: " + numberOfCells + " Rows :" + numberOfRows);
                 System.out.println("TR: " + tr.text() + "Attr: " + tr.attr("style"));
                 numberOfCells = 0;
-                int i =0;
+                int i = 0;
                 //Получаем все значения между тегами <TD>. Внутри могут находиться теги <B>. Поэтоу их тоже не забыть обработать.
                 // Так же есть входная дата, которая отличается маской от Екселевской. Нужно это задать.
                 //Так же разбиваем наш файл на две таблицы - первая таблица это у нас таблица заголовка, вторая таблица - остальная информация.
@@ -169,8 +169,14 @@ public class CreateExcel {
                             //конвертирование нашей строки и внесение ее в ячейку
                             findDateString = tds.text().replace("/" + tds.text().substring(tds.text().length() - 2, tds.text().length()), "/20" + tds.text().substring(tds.text().length() - 2 ,tds.text().length())).replace("/", ".");
                             richString = new HSSFRichTextString(findDateString);
-                            //в зависимости от жирности установка нужного стиля ячейки
                             if (bTag.text().length() != 0) {
+                                richString.applyFont(indexOfFirstElement, indexOfLastElement + 2, fontBOLD );
+                                richString.applyFont(indexOfLastElement + 2, findDateString.length(), fontNormal );
+                            }
+                            //в зависимости от жирности установка нужного стиля ячейки
+                            System.out.println("Length: bTag.text().length()" + bTag.text().length());
+                            if (tr.attr("style").length() != 0) {
+                                System.out.println("Length: bTag.text().length()" + bTag.text().length());
                                 cellInTable.setCellStyle(dateType);
                             } else {
                                 cellInTable.setCellStyle(standartStyle);
@@ -187,12 +193,8 @@ public class CreateExcel {
                                     cellInTable.setCellStyle(standartStyle);
                                 }
                             } else {
-                                if (tr.attr("style").length() != 0 && bTag.text().length() != 0) {
-                                    cellInTable.setCellStyle(rowStyleBoldAndForeGround);
-                                } else if (tr.attr("style").length() != 0) {
+                                if (tr.attr("style").length() != 0) {
                                     cellInTable.setCellStyle(rowStyleWithForeGround);
-                                } else if (bTag.text().length() != 0) {
-                                    cellInTable.setCellStyle(rowStyleBold);
                                 } else {
                                     cellInTable.setCellStyle(standartStyle);
                                 }
@@ -213,8 +215,14 @@ public class CreateExcel {
         for (int i = 2; i < sheet.getLastRowNum(); i++)
         {
             for (int k = 0; k < sheet.getRow(i).getLastCellNum(); k++) {
-                if (sheet.getRow(i).getCell(k).getStringCellValue().length() > sheet.getRow(2).getCell(k).getStringCellValue().length()) {
+                System.out.println("Last cell Number: " + sheet.getRow(i).getLastCellNum());
+                System.out.println("String Cell Value in Head: " + sheet.getRow(2).getCell(k).getStringCellValue());
+                System.out.println("String Cell Value not in Head: " + sheet.getRow(i).getCell(k).getStringCellValue());
+                if (sheet.getRow(i).getCell(k).getStringCellValue() != null && sheet.getRow(i).getCell(k).getStringCellValue().length() > sheet.getRow(2).getCell(k).getStringCellValue().length()) {
+                    System.out.println(k + " i " + i);
                     sheet.setColumnWidth(k, sheet.getRow(2).getCell(k).getStringCellValue().length() * 256 * 3);
+                    System.out.println(k + " i " + i);
+                    System.out.println(sheet.getLastRowNum());
                 }
             }
         }
