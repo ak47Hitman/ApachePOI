@@ -6,7 +6,7 @@ import java.util.ArrayList;
  */
 
 public class TextFile {
-    //Read text from file and return string Text
+    // Считываем файл и выдаем строку на результат
     public static String read(String fileName) {
         StringBuilder sb = new StringBuilder();
         try {
@@ -25,53 +25,5 @@ public class TextFile {
             throw new RuntimeException(e);
         }
         return sb.toString();
-    }
-
-    //Take text from file and write in the output file
-    //!!!!!Not consider /n
-    public static void write(String fileName, String text) {
-        try {
-            PrintWriter out = new PrintWriter(new File(fileName).getAbsoluteFile());
-            try {
-                out.print(text);
-            } finally {
-                out.close();
-            }
-        } catch(IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    //Split input text and return string massive
-    public String[] splitToString(String inputText, String splitType) {
-        String[] massString = inputText.split(splitType);
-        return massString;
-    }
-    //Проверить работоспособность метки незабыть
-    //Find word in text
-    public ArrayList<String> findWordInMyText(String textFromFile, String findError/*, String findDocumentum*/) {
-        final String textSpliteType = "\n";
-        final String stringFindError = " ";
-        final String stringSpliteDocumentum = "\\u002E";
-        String[] splitText = splitToString(textFromFile, textSpliteType);
-        ArrayList<String> errorList = new ArrayList<String>();
-        for (int i = 0; i < splitText.length; i++) {
-            String[] splitString = splitToString(splitText[i], stringFindError);
-        output:    for (int k = 0; k < splitString.length; k++) {
-                        if (splitString[k].toLowerCase().equals(findError.toLowerCase())) {
-                            String[] splitWord = splitToString(splitText[i], stringSpliteDocumentum);
-                            errorList.add(splitText[i-1] + "\n" + splitText[i]);
-                            break  output;
-//                            for (int j = 0; j < splitWord.length; j++) {
-//        //                        System.out.println("First: " + splitWord[j]);
-//                                if(splitWord[j].toLowerCase().equals(findDocumentum.toLowerCase())) {
-//                                    errorList.add(splitText[i]);
-//                                    break output;
-//                                }
-//                            }
-                        }
-                    }
-        }
-        return errorList;
     }
 }

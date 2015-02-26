@@ -27,7 +27,7 @@ public class CreateExcel {
         // Создаем лист. Название берем из заголовка
         Sheet sheet = wb.createSheet(parsingHtml.getTitle());
         // Создаем первую строку в таблице - она будет заголовком.
-        Row row = sheet.createRow((short)numberOfRows);
+        Row headerFirstRow = sheet.createRow((short)numberOfRows);
         // Объединяем регион для вставки заголвока. Для определения на сколько ячеек нужно обяединить строку мы высчитываем максимально
         // возможное число ячеек в строках таблицы
         sheet.addMergedRegion(new CellRangeAddress(
@@ -38,9 +38,9 @@ public class CreateExcel {
                                                               // равна максимальной возможной ячейке из всех строк таблицы
         ));
         // Создаем ячейку в первой строке
-        Cell cell = row.createCell(numberOfCells);
+        Cell headerCell = headerFirstRow.createCell(numberOfCells);
         // Укладываем в нее наш текст из заголовка
-        cell.setCellValue(parsingHtml.getHeader());
+        headerCell.setCellValue(parsingHtml.getHeader());
         // Заголовок должен быть жирным, а в тегах ничего про Жирность не указывается - поэтому мы задаем жирность РУКАМИ
         Font fontBOLD = wb.createFont();
         fontBOLD.setBoldweight(Font.BOLDWEIGHT_BOLD);
@@ -52,75 +52,51 @@ public class CreateExcel {
         // Говорим что текст должен быть жирным
         headerStyle.setFont(fontBOLD);
         // А так же указываем что заголовок должен быть по центру
-        headerStyle.setAlignment(CellStyle.ALIGN_CENTER);
+        headerStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
         // Укладываем стиль
-        cell.setCellStyle(headerStyle);
+        headerCell.setCellStyle(headerStyle);
         // Так как ячейка заполнена, и строка тоже - увеличиваем нашу строку на 1.
         numberOfRows++;
-        //
-        row = sheet.createRow((short)numberOfRows);
+        // Объединяем ячейки и всталяем пустое значение. Делается для красоты - отступа между заголовком и таблицей на вывод
+        headerFirstRow = sheet.createRow((short)numberOfRows);
+        // Объединяем ячейки
         sheet.addMergedRegion(new CellRangeAddress(
                 numberOfRows, //first row (0-based)
                 numberOfRows, //last row  (0-based)
                 0, //first column (0-based)
                 parsingHtml.getNumberOfTDForMergeCells() - 1  //last column  (0-based)
         ));
-        Cell cell2 = row.createCell(numberOfCells);
-        cell2.setCellValue("");
+        // Задаем пустую строку
+        Cell nullCell = headerFirstRow.createCell(numberOfCells);
+        nullCell.setCellValue("");
         numberOfRows++;
 
-        System.out.println("Cells: " + numberOfCells + " Rows :" + numberOfRows);
-        CellStyle cs = wb.createCellStyle();
-        cs.setAlignment(CellStyle.ALIGN_CENTER);
-
+        // Задаем стиль для шапки таблицы
+        CellStyle headStyle = wb.createCellStyle();
+        // Центрирование текста в заголовке
+        headStyle.setAlignment(CellStyle.ALIGN_CENTER);
+        // Задаем стиль для обычных ячеек в таблице
         CellStyle standartStyle = wb.createCellStyle();
-        standartStyle.setAlignment(CellStyle.ALIGN_CENTER);
+        // Центрирование текста в заголвоке
+        standartStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+        // Границы ячеек в таблице
         standartStyle.setBorderBottom(HSSFCellStyle.BORDER_MEDIUM);
         standartStyle.setBorderTop(HSSFCellStyle.BORDER_MEDIUM);
         standartStyle.setBorderRight(HSSFCellStyle.BORDER_MEDIUM);
         standartStyle.setBorderLeft(HSSFCellStyle.BORDER_MEDIUM);
+        // Перенос текста на новую строку
         standartStyle.setWrapText(true);
 
-        CellStyle dateType = wb.createCellStyle();
-        dateType.setAlignment(CellStyle.ALIGN_CENTER);
-        dateType.setBorderBottom(HSSFCellStyle.BORDER_MEDIUM);
-        dateType.setBorderTop(HSSFCellStyle.BORDER_MEDIUM);
-        dateType.setBorderRight(HSSFCellStyle.BORDER_MEDIUM);
-        dateType.setBorderLeft(HSSFCellStyle.BORDER_MEDIUM);
-        dateType.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
-        dateType.setFillPattern(headerStyle.SOLID_FOREGROUND);
-//        dateType.setDataFormat(wb.createDataFormat().getFormat("m/d/yy"));
-        dateType.setWrapText(true);
-
+        // Задаем стиль для подкрашенных ячеек таблицы
         CellStyle rowStyleWithForeGround = wb.createCellStyle();
-        rowStyleWithForeGround.setAlignment(CellStyle.ALIGN_CENTER);
+        rowStyleWithForeGround.setAlignment(HSSFCellStyle.ALIGN_CENTER);
         rowStyleWithForeGround.setBorderBottom(HSSFCellStyle.BORDER_MEDIUM);
         rowStyleWithForeGround.setBorderTop(HSSFCellStyle.BORDER_MEDIUM);
         rowStyleWithForeGround.setBorderRight(HSSFCellStyle.BORDER_MEDIUM);
         rowStyleWithForeGround.setBorderLeft(HSSFCellStyle.BORDER_MEDIUM);
         rowStyleWithForeGround.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
-        rowStyleWithForeGround.setFillPattern(headerStyle.SOLID_FOREGROUND);
+        rowStyleWithForeGround.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
         rowStyleWithForeGround.setWrapText(true);
-
-        CellStyle rowStyleBold = wb.createCellStyle();
-        rowStyleBold.setAlignment(CellStyle.ALIGN_CENTER);
-        rowStyleBold.setBorderBottom(HSSFCellStyle.BORDER_MEDIUM);
-        rowStyleBold.setBorderTop(HSSFCellStyle.BORDER_MEDIUM);
-        rowStyleBold.setBorderRight(HSSFCellStyle.BORDER_MEDIUM);
-        rowStyleBold.setBorderLeft(HSSFCellStyle.BORDER_MEDIUM);
-        rowStyleBold.setFont(fontBOLD);
-        rowStyleBold.setWrapText(true);
-
-        CellStyle rowStyleBoldAndForeGround = wb.createCellStyle();
-        rowStyleBoldAndForeGround.setAlignment(CellStyle.ALIGN_CENTER);
-        rowStyleBoldAndForeGround.setBorderBottom(HSSFCellStyle.BORDER_MEDIUM);
-        rowStyleBoldAndForeGround.setBorderTop(HSSFCellStyle.BORDER_MEDIUM);
-        rowStyleBoldAndForeGround.setBorderRight(HSSFCellStyle.BORDER_MEDIUM);
-        rowStyleBoldAndForeGround.setBorderLeft(HSSFCellStyle.BORDER_MEDIUM);
-        rowStyleBoldAndForeGround.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
-        rowStyleBoldAndForeGround.setFillPattern(headerStyle.SOLID_FOREGROUND);
-        rowStyleBoldAndForeGround.setFont(fontBOLD);
-        rowStyleBoldAndForeGround.setWrapText(true);
 
         Document doc = Jsoup.parse(inputText);
         Elements tables = doc.getElementsByTag("table");
@@ -132,7 +108,6 @@ public class CreateExcel {
                 System.out.println("Cells: " + numberOfCells + " Rows :" + numberOfRows);
                 System.out.println("TR: " + tr.text() + "Attr: " + tr.attr("style"));
                 numberOfCells = 0;
-                int i = 0;
                 //Получаем все значения между тегами <TD>. Внутри могут находиться теги <B>. Поэтоу их тоже не забыть обработать.
                 // Так же есть входная дата, которая отличается маской от Екселевской. Нужно это задать.
                 //Так же разбиваем наш файл на две таблицы - первая таблица это у нас таблица заголовка, вторая таблица - остальная информация.
@@ -142,10 +117,10 @@ public class CreateExcel {
                         //Если у нас на входе первая таблица, то делаем проверку и делаем выборку по первой таблице, в которой не проверяем на жирность заголовков
                         // и по первой таблице устанавливаем ширину таблицы по умолчанию равной ширине текста в ячейке
                         System.out.println("TD1: " + tds.text());
-                            Cell cellInTable = rowInTable.createCell(numberOfCells);
-                            cellInTable.setCellValue(tds.text());
-                            cellInTable.setCellStyle(cs);
-                            numberOfCells++;
+                        Cell cellInTable = rowInTable.createCell(numberOfCells);
+                        cellInTable.setCellValue(tds.text());
+                        cellInTable.setCellStyle(headStyle);
+                        numberOfCells++;
                         } else {
                         //Если у нас вторая таблица - то тут применяем жестокий парсинг ячеек.
                         // Для начала начинаем разбор ячейки на присутствие в ней даты - если дата есть то парсим строку и находим в ней нужные символы для замены / на точку .
@@ -169,60 +144,56 @@ public class CreateExcel {
                             //конвертирование нашей строки и внесение ее в ячейку
                             findDateString = tds.text().replace("/" + tds.text().substring(tds.text().length() - 2, tds.text().length()), "/20" + tds.text().substring(tds.text().length() - 2 ,tds.text().length())).replace("/", ".");
                             richString = new HSSFRichTextString(findDateString);
-                            if (bTag.text().length() != 0) {
-                                richString.applyFont(indexOfFirstElement, indexOfLastElement + 2, fontBOLD );
-                                richString.applyFont(indexOfLastElement + 2, findDateString.length(), fontNormal );
-                            }
-                            //в зависимости от жирности установка нужного стиля ячейки
-                            System.out.println("Length: bTag.text().length()" + bTag.text().length());
-                            if (tr.attr("style").length() != 0) {
-                                System.out.println("Length: bTag.text().length()" + bTag.text().length());
-                                cellInTable.setCellStyle(dateType);
-                            } else {
-                                cellInTable.setCellStyle(standartStyle);
-                            }
+                            // Увеличиваем индекс на 2 добавленных элемента в дате "/20"
+                            indexOfLastElement += 2;
                         }
+                        // Если дату не нашли то не парсим дату и задаем форматирование для остального текста
                         else {
                             richString = new HSSFRichTextString(tds.text());
-                            if (bTag.text().length() != 0) {
-                                richString.applyFont( indexOfFirstElement, indexOfLastElement, fontBOLD );
-                                richString.applyFont(indexOfLastElement, tds.text().length(), fontNormal );
-                                if (tr.attr("style").length() != 0) {
-                                    cellInTable.setCellStyle(rowStyleWithForeGround);
-                                } else {
-                                    cellInTable.setCellStyle(standartStyle);
-                                }
-                            } else {
-                                if (tr.attr("style").length() != 0) {
-                                    cellInTable.setCellStyle(rowStyleWithForeGround);
-                                } else {
-                                    cellInTable.setCellStyle(standartStyle);
-                                }
-                            }
                         }
-                        if (sheet.getRow(2).getCell(i).getStringCellValue().length() > tds.text().length()) {
-                            sheet.setColumnWidth(numberOfCells, sheet.getRow(2).getCell(numberOfCells).getStringCellValue().length() * 256);
+                        // Если присутствует тэг <b> в тексте
+                        if (bTag.text().length() != 0) {
+                            richString.applyFont(indexOfFirstElement, indexOfLastElement, fontBOLD);
                         }
+                        //в зависимости от жирности установка нужного стиля ячейки
+                        if (tr.attr("style").length() != 0) {
+                            cellInTable.setCellStyle(rowStyleWithForeGround);
+                        } else {
+                            cellInTable.setCellStyle(standartStyle);
+                        }
+                        // Вставляем значение в ячейку
                         cellInTable.setCellValue(richString);
+                        // Увеличиваем счетчик ячеек
                         numberOfCells++;
                         }
                 }
+                // Если есть еще таблицы в HTML - файле то увеличиваем счетчик таблиц и повторяем цикл
                 numberOfTable++;
+                // У величиваем счетчик строк
                 numberOfRows++;
             }
         }
-        HSSFFormulaEvaluator.evaluateAllFormulaCells(wb);
+        // Установка ширины ячейки исходя из длинны заголовка. Перебираем каждую строку в таблице и в каждой строке перебираем ячейки.
+        // Если ширина заголовка больше или равна длинне значения в ячейке, то шириной ячейки устанавливаем длинну заголовка * 256 (системное значение).
+        // Если же ширина заголовка меньше длинны значения в ячейке, то устанавливаем ширину ячейки как длинна заголовка * 256 (системное значение) * 3.
+        // Умножаем на 3 для красоты. При умножении на 2 слишком сжатый вид. При желании можно установить своё значение - в зависимотси от пожелания.
+        // Пробегаем по всем строкам в таблице
         for (int i = 2; i < sheet.getLastRowNum(); i++)
-        {
+        {   // В каждой строке пробегаем по всем ячейкам таблицы
             for (int k = 0; k < sheet.getRow(i).getLastCellNum(); k++) {
-                System.out.println("Last cell Number: " + sheet.getRow(i).getLastCellNum());
-                System.out.println("String Cell Value in Head: " + sheet.getRow(2).getCell(k).getStringCellValue());
-                System.out.println("String Cell Value not in Head: " + sheet.getRow(i).getCell(k).getStringCellValue());
-                if (sheet.getRow(i).getCell(k).getStringCellValue() != null && sheet.getRow(i).getCell(k).getStringCellValue().length() > sheet.getRow(2).getCell(k).getStringCellValue().length()) {
-                    System.out.println(k + " i " + i);
-                    sheet.setColumnWidth(k, sheet.getRow(2).getCell(k).getStringCellValue().length() * 256 * 3);
-                    System.out.println(k + " i " + i);
-                    System.out.println(sheet.getLastRowNum());
+                // Если ширина колонки меньше чем ширина заголовка * на 256 (системный коэффициент) * 3, то изменяем значение.
+                // Если же ширина колонки больше либо равна ширине заголовка, то это говорит о том что мы изменили значение в ячейке и такие ячейки не надо изменять.
+                if(sheet.getColumnWidth(k) < sheet.getRow(2).getCell(k).getStringCellValue().length() * 256 * 3) {
+                    // Если значение в ячейке не null (избежать null pointer Exception) и длинна текста в ячейке больше чем длина заголовка,
+                    // то установим значение ширины ячейки как ширина заголовка * 256 * 3
+                    if (sheet.getRow(i).getCell(k).getStringCellValue() != null &&
+                            sheet.getRow(i).getCell(k).getStringCellValue().length() > sheet.getRow(2).getCell(k).getStringCellValue().length()) {
+                        sheet.setColumnWidth(k, sheet.getRow(2).getCell(k).getStringCellValue().length() * 256 * 3);
+                        System.out.println(sheet.getLastRowNum());
+                        // Иначе устанавливаем значение ширины ячейки как ширина заголовка * 256. Проверка на не null
+                    } else if (sheet.getRow(i).getCell(k).getStringCellValue() != null && sheet.getRow(i).getCell(k).getStringCellValue().length() <= sheet.getRow(2).getCell(k).getStringCellValue().length()){
+                        sheet.setColumnWidth(k, sheet.getRow(2).getCell(k).getStringCellValue().length() * 256);
+                    }
                 }
             }
         }
