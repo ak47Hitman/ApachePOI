@@ -105,7 +105,6 @@ public class CreateExcel {
             Elements trs = table.getElementsByTag("tr");
             for (Element tr : trs) {
                 Row rowInTable = sheet.createRow(numberOfRows);
-                System.out.println("Cells: " + numberOfCells + " Rows :" + numberOfRows);
                 System.out.println("TR: " + tr.text() + "Attr: " + tr.attr("style"));
                 numberOfCells = 0;
                 //Получаем все значения между тегами <TD>. Внутри могут находиться теги <B>. Поэтоу их тоже не забыть обработать.
@@ -167,10 +166,11 @@ public class CreateExcel {
                         numberOfCells++;
                         }
                 }
-                // Если есть еще таблицы в HTML - файле то увеличиваем счетчик таблиц и повторяем цикл
+                // Если есть еще таблицы в HTML - файле, то увеличиваем счетчик таблиц и повторяем цикл
                 numberOfTable++;
                 // У величиваем счетчик строк
                 numberOfRows++;
+                numberOfCells = 0;
             }
         }
         // Установка ширины ячейки исходя из длинны заголовка. Перебираем каждую строку в таблице и в каждой строке перебираем ячейки.
@@ -180,9 +180,11 @@ public class CreateExcel {
         // Пробегаем по всем строкам в таблице
         for (int i = 2; i < sheet.getLastRowNum(); i++)
         {   // В каждой строке пробегаем по всем ячейкам таблицы
+            System.out.println("ROW: " + i + " Last ROW:" + sheet.getLastRowNum());
             for (int k = 0; k < sheet.getRow(i).getLastCellNum(); k++) {
                 // Если ширина колонки меньше чем ширина заголовка * на 256 (системный коэффициент) * 3, то изменяем значение.
                 // Если же ширина колонки больше либо равна ширине заголовка, то это говорит о том что мы изменили значение в ячейке и такие ячейки не надо изменять.
+                System.out.println("CELL: " + k + " Last CELL:" + sheet.getRow(i).getLastCellNum());
                 if(sheet.getColumnWidth(k) < sheet.getRow(2).getCell(k).getStringCellValue().length() * 256 * 3) {
                     // Если значение в ячейке не null (избежать null pointer Exception) и длинна текста в ячейке больше чем длина заголовка,
                     // то установим значение ширины ячейки как ширина заголовка * 256 * 3
